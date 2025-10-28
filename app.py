@@ -4,8 +4,9 @@ import pandas as pd
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 import uuid
-import time, os
+import time, os , sys
 from feature_engineer import FeatureEngineer 
+sys.modules['__main__'].FeatureEngineer = FeatureEngineer
 app = Flask(__name__)
 
 
