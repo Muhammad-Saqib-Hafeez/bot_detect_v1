@@ -1,0 +1,19 @@
+# Test with different user agents
+@('Python-urllib/3.8', 'Go-http-client/1.1', 'Java/1.8.0_291') | ForEach-Object {
+    $response = Invoke-WebRequest -Uri "http://localhost:5000/" -UserAgent $_
+    Write-Host "UA: $_ -> Redirected to: $($response.BaseResponse.ResponseUri)"
+}
+
+
+
+
+curl http://localhost:5000/
+
+# Using wget
+wget http://localhost:5000/
+
+# Using HTTPie
+http GET http://localhost:5000/
+
+
+

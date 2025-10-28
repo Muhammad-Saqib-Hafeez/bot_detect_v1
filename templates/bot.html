@@ -1,0 +1,389 @@
+{% extends "base.html" %}
+
+{% block title %}Bot Detected - BotDetect Pro{% endblock %}
+
+{% block content %}
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<div class="min-h-screen bg-gradient-to-br from-red-50 to-orange-100 py-8 px-4">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header Section -->
+        <div class="text-center mb-12">
+            <div class="flex justify-center mb-6">
+                <div class="w-24 h-24 bg-gradient-to-r from-red-500 to-orange-600 rounded-full flex items-center justify-center shadow-lg floating">
+                    <i class="fas fa-robot text-white text-4xl"></i>
+                </div>
+            </div>
+            <h1 class="text-5xl font-bold text-gray-800 mb-4">
+                Automated Bot Detected 
+                <span class="text-red-600">⚠️</span>
+            </h1>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+                Our advanced AI system has identified this request as originating from an automated bot with high confidence.
+            </p>
+        </div>
+
+        <!-- Detection Result Card -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8 border-l-4 border-red-500 transform hover:scale-[1.02] transition-transform duration-300">
+            <div class="flex items-start space-x-6">
+                <div class="flex-shrink-0">
+                    <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-exclamation-triangle text-red-600 text-3xl"></i>
+                    </div>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-3xl font-bold text-gray-800 mb-6">AI Detection Result</h3>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center p-4 bg-red-50 rounded-lg">
+                                <span class="text-gray-700 font-semibold">Confidence Level:</span>
+                                <span class="text-red-600 font-bold text-xl">{{ confidence }}%</span>
+                            </div>
+                            <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                                <span class="text-gray-700 font-semibold">Request ID:</span>
+                                <code class="bg-gray-200 px-3 py-1 rounded-lg text-sm font-mono font-bold">{{ request_id }}</code>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center p-4 bg-red-50 rounded-lg">
+                                <span class="text-gray-700 font-semibold">Classification:</span>
+                                <span class="text-red-600 font-bold text-lg">Automated System</span>
+                            </div>
+                            <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                                <span class="text-gray-700 font-semibold">Your IP:</span>
+                                <code class="bg-gray-200 px-3 py-1 rounded-lg text-sm font-mono">{{ current_request.ip }}</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Impact Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-red-400 transform hover:scale-105 transition-all duration-300">
+                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-ban text-red-600 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-3">Limited Access</h3>
+                <p class="text-gray-600 leading-relaxed">Bot requests have restricted access to protect system resources and user data</p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-orange-400 transform hover:scale-105 transition-all duration-300">
+                <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-filter text-orange-600 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-3">Content Filtered</h3>
+                <p class="text-gray-600 leading-relaxed">Some content may be unavailable to automated systems to prevent data scraping</p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-yellow-400 transform hover:scale-105 transition-all duration-300">
+                <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-hourglass-half text-yellow-600 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-3">Rate Limited</h3>
+                <p class="text-gray-600 leading-relaxed">Requests are subject to rate limiting controls to prevent system abuse</p>
+            </div>
+        </div>
+
+        <!-- Security Protection Section -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+            <div class="flex items-center mb-8">
+                <div class="w-14 h-14 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center mr-4">
+                    <i class="fas fa-shield-alt text-white text-xl"></i>
+                </div>
+                <h3 class="text-3xl font-bold text-gray-800">Security Protection Active</h3>
+            </div>
+            
+            <p class="text-lg text-gray-600 mb-6 text-center">This automatic detection helps prevent various security threats:</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="flex items-center p-4 bg-red-50 rounded-lg border border-red-200">
+                    <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                        <span class="text-xl">🤖</span>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-800">Web Scraping</h4>
+                        <p class="text-sm text-gray-600">Data harvesting</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center p-4 bg-orange-50 rounded-lg border border-orange-200">
+                    <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mr-4">
+                        <span class="text-xl">⚡</span>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-800">DDoS Attacks</h4>
+                        <p class="text-sm text-gray-600">Resource abuse</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                    <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mr-4">
+                        <span class="text-xl">🔐</span>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-800">Credential Stuffing</h4>
+                        <p class="text-sm text-gray-600">Brute force attacks</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center p-4 bg-red-50 rounded-lg border border-red-200">
+                    <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                        <span class="text-xl">🔍</span>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-800">Vulnerability Scanning</h4>
+                        <p class="text-sm text-gray-600">Automated probing</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center p-4 bg-orange-50 rounded-lg border border-orange-200">
+                    <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mr-4">
+                        <span class="text-xl">📊</span>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-800">Analytics Pollution</h4>
+                        <p class="text-sm text-gray-600">Data accuracy</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                    <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mr-4">
+                        <span class="text-xl">🚫</span>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-800">API Abuse</h4>
+                        <p class="text-sm text-gray-600">Service disruption</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technical Analysis -->
+        <div class="bg-gradient-to-r from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-8 text-white mb-8">
+            <div class="flex items-center mb-6">
+                <div class="w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mr-4">
+                    <i class="fas fa-microscope text-white text-xl"></i>
+                </div>
+                <h3 class="text-3xl font-bold">Detection Analysis</h3>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div class="flex items-start space-x-3">
+                        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                            <i class="fas fa-brain text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-blue-300">Detection Method</h4>
+                            <p class="text-gray-300">Machine Learning Classification</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start space-x-3">
+                        <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                            <i class="fas fa-chart-line text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-green-300">Model Accuracy</h4>
+                            <p class="text-gray-300">92%+ Verified Performance</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="flex items-start space-x-3">
+                        <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                            <i class="fas fa-cogs text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-purple-300">Features Analyzed</h4>
+                            <p class="text-gray-300">User Agent, Request Patterns, Behavioral Signals</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start space-x-3">
+                        <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                            <i class="fas fa-shield-alt text-white text-sm"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-red-300">Response Action</h4>
+                            <p class="text-gray-300">Access Restrictions Applied</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confidence Visualization -->
+        <div class="bg-gradient-to-r from-red-500 to-orange-600 rounded-2xl shadow-2xl p-8 text-white text-center mb-8">
+            <h3 class="text-2xl font-bold mb-4">AI Confidence Score</h3>
+            <div class="text-6xl font-bold mb-4">{{ confidence }}%</div>
+            <p class="text-red-100 text-lg mb-4">High confidence in bot behavior detection</p>
+            <div class="bg-red-300 bg-opacity-30 rounded-full h-4 mx-auto max-w-md">
+                <div class="bg-white h-4 rounded-full" style="width: {{ confidence }}%"></div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+            <a href="/test-human" class="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white font-bold py-4 px-8 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-3">
+                <i class="fas fa-user"></i>
+                <span>Test Human Detection</span>
+            </a>
+            
+            <a href="/admin" class="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-bold py-4 px-8 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-3">
+                <i class="fas fa-info-circle"></i>
+                <span>View Technical Details</span>
+            </a>
+            
+            <button onclick="requestHumanReview()" class="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold py-4 px-8 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-3">
+                <i class="fas fa-flag"></i>
+                <span>Request Human Review</span>
+            </button>
+        </div>
+
+        <!-- Review Request Section -->
+        <div id="reviewRequest" class="bg-white rounded-2xl shadow-xl p-8 mb-8 hidden">
+            <div class="text-center">
+                <div class="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-user-check text-orange-600 text-3xl"></i>
+                </div>
+                <h4 class="text-2xl font-bold text-gray-800 mb-4">Human Review Requested</h4>
+                <p class="text-gray-600 text-lg mb-6 max-w-md mx-auto">
+                    Your request has been submitted for manual review by our security team. 
+                    This process typically takes 5-10 minutes.
+                </p>
+                
+                <div class="bg-gray-100 rounded-xl p-6 max-w-md mx-auto">
+                    <div class="text-sm text-gray-600 mb-2">Estimated wait time:</div>
+                    <div class="text-3xl font-bold text-gray-800 mb-4" id="timer">5:00</div>
+                    <div class="bg-gray-300 rounded-full h-3">
+                        <div class="bg-gradient-to-r from-orange-500 to-red-500 h-3 rounded-full transition-all duration-1000" id="timerProgress"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Alert Banner -->
+        <div class="bg-gradient-to-r from-red-600 to-orange-600 rounded-2xl shadow-2xl p-6 text-white text-center">
+            <div class="flex items-center justify-center space-x-4">
+                <i class="fas fa-exclamation-circle text-2xl"></i>
+                <div>
+                    <h4 class="font-bold text-lg">Security Alert</h4>
+                    <p class="text-red-100">Automated access attempts are logged and monitored</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom JavaScript -->
+<script>
+// Human review request function
+function requestHumanReview() {
+    const reviewSection = document.getElementById('reviewRequest');
+    reviewSection.classList.remove('hidden');
+    reviewSection.scrollIntoView({ behavior: 'smooth' });
+    
+    let timeLeft = 300; // 5 minutes in seconds
+    const timerElement = document.getElementById('timer');
+    const progressBar = document.getElementById('timerProgress');
+    
+    const timer = setInterval(() => {
+        timeLeft--;
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        
+        timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        const progress = ((300 - timeLeft) / 300) * 100;
+        progressBar.style.width = `${progress}%`;
+        
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            timerElement.textContent = "Review Complete!";
+            timerElement.className = "text-3xl font-bold text-green-600 mb-4";
+            progressBar.className = "bg-gradient-to-r from-green-500 to-emerald-500 h-3 rounded-full";
+        }
+    }, 1000);
+}
+
+// Add floating animation to security icons
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate confidence score
+    const confidenceScore = document.querySelector('.text-6xl');
+    let current = 0;
+    const target = parseInt(confidenceScore.textContent);
+    const increment = target / 50;
+    
+    const counter = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+            confidenceScore.textContent = target + '%';
+            clearInterval(counter);
+        } else {
+            confidenceScore.textContent = Math.floor(current) + '%';
+        }
+    }, 30);
+    
+    // Add pulse animation to security alert
+    const alertBanner = document.querySelector('.bg-gradient-to-r.from-red-600');
+    setInterval(() => {
+        alertBanner.classList.toggle('shadow-2xl');
+        alertBanner.classList.toggle('shadow-xl');
+    }, 2000);
+});
+</script>
+
+<style>
+/* Custom animations */
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+.floating {
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+}
+
+.pulse-alert {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* Smooth transitions */
+* {
+    transition: all 0.3s ease;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #ef4444, #f97316);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to bottom, #dc2626, #ea580c);
+}
+
+/* Security warning glow effect */
+.security-glow {
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+}
+</style>
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Bot Detection Test - BotDetect Pro{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <i class="fas fa-shield-alt"></i>
+                AI-Powered Bot Detection
+            </h1>
+            <p class="hero-subtitle">Advanced machine learning system to distinguish between human users and automated bots</p>
+        </div>
+    </div>
+
+    <div class="detection-card">
+        <div class="card-header">
+            <h2><i class="fas fa-search"></i> Test Request Detection</h2>
+            <p>Enter request details to analyze if it's from a human or bot</p>
+        </div>
+
+        <form id="detectionForm" class="detection-form">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="method"><i class="fas fa-code"></i> HTTP Method</label>
+                    <select id="method" name="method" class="form-select">
+                        <option value="GET">GET</option>
+                        <option value="POST" selected>POST</option>
+                        <option value="PUT">PUT</option>
+                        <option value="DELETE">DELETE</option>
+                        <option value="OPTIONS">OPTIONS</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="bytes"><i class="fas fa-database"></i> Response Bytes</label>
+                    <input type="number" id="bytes" name="bytes" value="512" class="form-input" min="0" max="10000">
+                </div>
+
+                <div class="form-group">
+                    <label for="is_headless"><i class="fas fa-window-close"></i> Headless Browser</label>
+                    <select id="is_headless" name="is_headless" class="form-select">
+                        <option value="0">No (0)</option>
+                        <option value="1" selected>Yes (1)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="user_agent"><i class="fas fa-desktop"></i> User Agent</label>
+                <textarea id="user_agent" name="user_agent" class="form-textarea" rows="3">Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36 OPR/64.0.3417.61</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="path"><i class="fas fa-link"></i> Request Path</label>
+                <input type="text" id="path" name="path" value="https://160.40.52.164/content/web_bots.php" class="form-input">
+            </div>
+
+            <button type="submit" class="detect-button">
+                <i class="fas fa-play"></i> Analyze Request
+            </button>
+        </form>
+
+        <div id="result" class="result-section" style="display: none;">
+            <div class="result-card">
+                <div id="resultIcon" class="result-icon"></div>
+                <div class="result-content">
+                    <h3 id="resultTitle">Analysis Result</h3>
+                    <p id="resultText" class="result-text"></p>
+                    <div class="confidence-meter">
+                        <div class="confidence-label">Confidence Level</div>
+                        <div class="confidence-bar">
+                            <div id="confidenceFill" class="confidence-fill"></div>
+                        </div>
+                        <div id="confidenceText" class="confidence-text">0%</div>
+                    </div>
+                    <div class="probability-breakdown">
+                        <div class="prob-item">
+                            <span class="prob-label">Bot Probability:</span>
+                            <span id="botProb" class="prob-value">0%</span>
+                        </div>
+                        <div class="prob-item">
+                            <span class="prob-label">Human Probability:</span>
+                            <span id="humanProb" class="prob-value">0%</span>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <a id="resultLink" href="#" class="action-button">
+                            <i class="fas fa-arrow-right"></i> Continue to Page
+                        </a>
+                        <button onclick="resetForm()" class="action-button secondary">
+                            <i class="fas fa-redo"></i> Test Another
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-section">
+        <div class="info-grid">
+            <div class="info-card">
+                <i class="fas fa-brain"></i>
+                <h3>AI Powered</h3>
+                <p>Advanced machine learning model trained on thousands of requests</p>
+            </div>
+            <div class="info-card">
+                <i class="fas fa-bolt"></i>
+                <h3>Real-time Analysis</h3>
+                <p>Instant detection and classification of incoming requests</p>
+            </div>
+            <div class="info-card">
+                <i class="fas fa-chart-line"></i>
+                <h3>High Accuracy</h3>
+                <p>92%+ accuracy in distinguishing bots from humans</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

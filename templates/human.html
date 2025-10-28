@@ -1,0 +1,344 @@
+{% extends "base.html" %}
+
+{% block title %}Human Access Granted - BotDetect Pro{% endblock %}
+
+{% block content %}
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<div class="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 py-8 px-4">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header Section -->
+        <div class="text-center mb-12">
+            <div class="flex justify-center mb-6">
+                <div class="w-24 h-24 bg-gradient-to-r from-green-400 to-emerald-600 rounded-full flex items-center justify-center shadow-lg">
+                    <i class="fas fa-user-check text-white text-4xl"></i>
+                </div>
+            </div>
+            <h1 class="text-5xl font-bold text-gray-800 mb-4">
+                Human Access Granted 
+                <span class="text-green-600">✅</span>
+            </h1>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+                Welcome! Our advanced AI system has verified you as a legitimate human user with high confidence.
+            </p>
+        </div>
+
+        <!-- Detection Result Card -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8 border-l-4 border-green-500">
+            <div class="flex items-start space-x-4">
+                <div class="flex-shrink-0">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-shield-check text-green-600 text-2xl"></i>
+                    </div>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">AI Verification Complete</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 font-medium">Confidence Level:</span>
+                                <span class="text-green-600 font-bold text-lg">{{ confidence }}%</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 font-medium">Request ID:</span>
+                                <code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">{{ request_id }}</code>
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600 font-medium">Your IP:</span>
+                                <code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">{{ current_request.ip }}</code>
+                            </div>
+                            <div class="flex justify-between items-start">
+                                <span class="text-gray-600 font-medium">User Agent:</span>
+                                <small class="bg-gray-100 px-2 py-1 rounded text-xs font-mono max-w-xs text-right">{{ current_request.user_agent }}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div class="bg-white rounded-xl shadow-lg p-6 text-center transform hover:scale-105 transition-transform duration-300">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-tachometer-alt text-blue-600 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Full Access Granted</h3>
+                <p class="text-gray-600">Complete access to all premium features and resources</p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-6 text-center transform hover:scale-105 transition-transform duration-300">
+                <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-clock text-purple-600 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">No Restrictions</h3>
+                <p class="text-gray-600">No rate limiting or access restrictions applied</p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-6 text-center transform hover:scale-105 transition-transform duration-300">
+                <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-user-friends text-indigo-600 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Priority Service</h3>
+                <p class="text-gray-600">Faster loading times and enhanced user experience</p>
+            </div>
+        </div>
+
+        <!-- Real-time Activity Monitor -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+            <div class="flex items-center mb-6">
+                <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mr-4">
+                    <i class="fas fa-chart-line text-white text-xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800">Real-time Human Activity Monitor</h3>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 text-center border border-green-200">
+                    <div class="text-3xl font-bold text-green-600 mb-2" id="mouseMovements">0</div>
+                    <div class="text-sm text-gray-600 font-medium">Mouse Movements</div>
+                    <div class="mt-2">
+                        <i class="fas fa-mouse-pointer text-green-400"></i>
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 text-center border border-blue-200">
+                    <div class="text-3xl font-bold text-blue-600 mb-2" id="clicks">0</div>
+                    <div class="text-sm text-gray-600 font-medium">Clicks</div>
+                    <div class="mt-2">
+                        <i class="fas fa-mouse text-blue-400"></i>
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 text-center border border-purple-200">
+                    <div class="text-3xl font-bold text-purple-600 mb-2" id="scrolls">0</div>
+                    <div class="text-sm text-gray-600 font-medium">Scroll Events</div>
+                    <div class="mt-2">
+                        <i class="fas fa-scroll text-purple-400"></i>
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-4 text-center border border-orange-200">
+                    <div class="text-3xl font-bold text-orange-600 mb-2" id="keystrokes">0</div>
+                    <div class="text-sm text-gray-600 font-medium">Keystrokes</div>
+                    <div class="mt-2">
+                        <i class="fas fa-keyboard text-orange-400"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+            <button onclick="simulateHumanActivity()" class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 px-8 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-3">
+                <i class="fas fa-mouse"></i>
+                <span>Simulate Human Behavior</span>
+            </button>
+            
+            <a href="/admin" class="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white font-bold py-4 px-8 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-3">
+                <i class="fas fa-info-circle"></i>
+                <span>View Request Details</span>
+            </a>
+            
+            <a href="/test-bot" class="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold py-4 px-8 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-3">
+                <i class="fas fa-robot"></i>
+                <span>Test Bot Detection</span>
+            </a>
+        </div>
+
+        <!-- Activity Simulation -->
+        <div id="activitySimulation" class="bg-white rounded-2xl shadow-xl p-8 mb-8 hidden">
+            <div class="flex items-center mb-6">
+                <div class="w-12 h-12 bg-gradient-to-r from-green-400 to-teal-500 rounded-full flex items-center justify-center mr-4">
+                    <i class="fas fa-play-circle text-white text-xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800">Human Behavior Simulation Active</h3>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-mouse-pointer text-green-600"></i>
+                        </div>
+                        <span class="text-gray-700 font-medium">Random mouse movements</span>
+                    </div>
+                    <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold" id="mouseCount">0</span>
+                </div>
+                
+                <div class="flex items-center justify-between p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-keyboard text-blue-600"></i>
+                        </div>
+                        <span class="text-gray-700 font-medium">Natural keyboard input</span>
+                    </div>
+                    <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-bold" id="keyboardCount">0</span>
+                </div>
+                
+                <div class="flex items-center justify-between p-4 bg-purple-50 rounded-lg border border-purple-200">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-scroll text-purple-600"></i>
+                        </div>
+                        <span class="text-gray-700 font-medium">Smooth scrolling</span>
+                    </div>
+                    <span class="bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-bold" id="scrollCount">0</span>
+                </div>
+                
+                <div class="flex items-center justify-between p-4 bg-indigo-50 rounded-lg border border-indigo-200">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-magic text-indigo-600"></i>
+                        </div>
+                        <span class="text-gray-700 font-medium">Human-like timing</span>
+                    </div>
+                    <span class="bg-indigo-500 text-white px-3 py-1 rounded-full text-sm font-bold" id="timingCount">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confidence Visualization -->
+        <div class="bg-gradient-to-r from-green-400 to-emerald-600 rounded-2xl shadow-2xl p-8 text-white text-center">
+            <h3 class="text-2xl font-bold mb-4">AI Confidence Score</h3>
+            <div class="text-6xl font-bold mb-4">{{ confidence }}%</div>
+            <p class="text-green-100 text-lg">High confidence in human behavior detection</p>
+            <div class="mt-4 bg-green-300 bg-opacity-30 rounded-full h-4">
+                <div class="bg-white h-4 rounded-full" style="width: {{ confidence }}%"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom JavaScript -->
+<script>
+// Real-time activity tracking
+let mouseCount = 0;
+let clickCount = 0;
+let scrollCount = 0;
+let keyCount = 0;
+
+document.addEventListener('mousemove', () => {
+    mouseCount++;
+    document.getElementById('mouseMovements').textContent = mouseCount;
+});
+
+document.addEventListener('click', () => {
+    clickCount++;
+    document.getElementById('clicks').textContent = clickCount;
+});
+
+document.addEventListener('scroll', () => {
+    scrollCount++;
+    document.getElementById('scrolls').textContent = scrollCount;
+});
+
+document.addEventListener('keydown', () => {
+    keyCount++;
+    document.getElementById('keystrokes').textContent = keyCount;
+});
+
+// Enhanced simulation function
+function simulateHumanActivity() {
+    const simulation = document.getElementById('activitySimulation');
+    simulation.classList.remove('hidden');
+    simulation.scrollIntoView({ behavior: 'smooth' });
+    
+    let simMouseCount = 0;
+    let simKeyCount = 0;
+    let simScrollCount = 0;
+    let simTimingCount = 0;
+    
+    const mouseInterval = setInterval(() => {
+        simMouseCount++;
+        document.getElementById('mouseCount').textContent = simMouseCount;
+    }, 100);
+    
+    const keyInterval = setInterval(() => {
+        simKeyCount++;
+        document.getElementById('keyboardCount').textContent = simKeyCount;
+    }, 500);
+    
+    const scrollInterval = setInterval(() => {
+        simScrollCount++;
+        document.getElementById('scrollCount').textContent = simScrollCount;
+    }, 1000);
+    
+    const timingInterval = setInterval(() => {
+        simTimingCount++;
+        document.getElementById('timingCount').textContent = simTimingCount;
+    }, 2000);
+    
+    // Stop simulation after 10 seconds
+    setTimeout(() => {
+        clearInterval(mouseInterval);
+        clearInterval(keyInterval);
+        clearInterval(scrollInterval);
+        clearInterval(timingInterval);
+        
+        // Add completion animation
+        simulation.classList.add('bg-gradient-to-r', 'from-green-50', 'to-emerald-100');
+    }, 10000);
+}
+
+// Add some interactive animations
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate counters on load
+    const counters = document.querySelectorAll('.text-3xl');
+    counters.forEach(counter => {
+        const target = parseInt(counter.textContent);
+        let current = 0;
+        const increment = target / 50;
+        
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                counter.textContent = target;
+                clearInterval(timer);
+            } else {
+                counter.textContent = Math.floor(current);
+            }
+        }, 20);
+    });
+});
+</script>
+
+<style>
+/* Custom animations */
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+.floating {
+    animation: float 3s ease-in-out infinite;
+}
+
+/* Smooth transitions */
+* {
+    transition: all 0.3s ease;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #10b981, #059669);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to bottom, #059669, #047857);
+}
+</style>
+{% endblock %}

@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}Manual Testing - BotDetect Pro{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="manual-test-page">
+        <h1><i class="fas fa-vial"></i> Manual Bot Detection Testing</h1>
+        <p>Test the bot detection system with custom parameters</p>
+        
+        <div class="test-form-container">
+            <form id="manualTestForm" class="detection-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="method">HTTP Method</label>
+                        <select id="method" name="method" class="form-select">
+                            <option value="GET">GET</option>
+                            <option value="POST" selected>POST</option>
+                            <option value="PUT">PUT</option>
+                            <option value="DELETE">DELETE</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bytes">Response Bytes</label>
+                        <input type="number" id="bytes" name="bytes" value="512" class="form-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="is_headless">Headless Browser</label>
+                        <select id="is_headless" name="is_headless" class="form-select">
+                            <option value="0">No</option>
+                            <option value="1" selected>Yes</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="user_agent">User Agent</label>
+                    <textarea id="user_agent" name="user_agent" class="form-textarea" rows="3">Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="path">Request Path</label>
+                    <input type="text" id="path" name="path" value="/api/data" class="form-input">
+                </div>
+
+                <button type="submit" class="detect-button">
+                    <i class="fas fa-play"></i> Test Detection
+                </button>
+            </form>
+
+            <div id="manualResult" class="result-section" style="display: none;">
+                <!-- Results will be displayed here -->
+            </div>
+        </div>
+
+        <div class="quick-tests">
+            <h3>Quick Test Scenarios</h3>
+            <div class="test-buttons">
+                <button onclick="loadTest('human')" class="test-button human-test">
+                    <i class="fas fa-user"></i> Human-like Request
+                </button>
+                <button onclick="loadTest('bot')" class="test-button bot-test">
+                    <i class="fas fa-robot"></i> Bot-like Request
+                </button>
+                <button onclick="loadTest('headless')" class="test-button warning-test">
+                    <i class="fas fa-window-close"></i> Headless Browser
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function loadTest(type) {
+    const tests = {
+        human: {
+            method: 'GET',
+            bytes: 1024,
+            is_headless: 0,
+            user_agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            path: '/home'
+        },
+        bot: {
+            method: 'POST', 
+            bytes: 449,
+            is_headless: 1,
+            user_agent: 'Python-urllib/3.8',
+            path: '/api/data'
+        },
+        headless: {
+            method: 'GET',
+            bytes: 512,
+            is_headless: 1,
+            user_agent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/91.0.4472.124 Safari/537.36',
+            path: '/scrape'
+        }
+    };
+
+    const test = tests[type];
+    document.getElementById('method').value = test.method;
+    document.getElementById('bytes').value = test.bytes;
+    document.getElementById('is_headless').value = test.is_headless;
+    document.getElementById('user_agent').value = test.user_agent;
+    document.getElementById('path').value = test.path;
+}
+
+// Manual test form submission
+document.getElementById('manualTestForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = {
+        method: document.getElementById('method').value,
+        bytes: parseInt(document.getElementById('bytes').value),
+        is_headless: parseInt(document.getElementById('is_headless').value),
+        user_agent: document.getElementById('user_agent').value,
+        path: document.getElementById('path').value
+    };
+    
+    const button = this.querySelector('.detect-button');
+    const originalText = button.innerHTML;
+    
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
+    button.disabled = true;
+    
+    try {
+        const response = await fetch('/manual-test', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.error) {
+            throw new Error(result.error);
+        }
+        
+        displayManualResult(result);
+        
+    } catch (error) {
+        alert('Error: ' + error.message);
+    } finally {
+        button.innerHTML = originalText;
+        button.disabled = false;
+    }
+});
+
+function displayManualResult(result) {
+    const resultSection = document.getElementById('manualResult');
+    const isHuman = result.prediction === 'human';
+    
+    resultSection.innerHTML = `
+        <div class="result-card">
+            <div class="result-icon ${isHuman ? 'human' : 'bot'}">
+                <i class="fas fa-${isHuman ? 'user-check' : 'robot'}"></i>
+            </div>
+            <div class="result-content">
+                <h3>${isHuman ? 'Human Detected ✅' : 'Bot Detected ⚠️'}</h3>
+                <p class="result-text">${isHuman ? 'The request appears to be from a legitimate human user.' : 'The request has been identified as an automated bot.'}</p>
+                <div class="confidence-meter">
+                    <div class="confidence-label">Confidence Level</div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill ${isHuman ? 'human' : 'bot'}" style="width: ${result.confidence}%"></div>
+                    </div>
+                    <div class="confidence-text">${result.confidence}%</div>
+                </div>
+                <div class="probability-breakdown">
+                    <div class="prob-item">
+                        <span class="prob-label">Bot Probability:</span>
+                        <span class="prob-value">${result.probabilities.bot}%</span>
+                    </div>
+                    <div class="prob-item">
+                        <span class="prob-label">Human Probability:</span>
+                        <span class="prob-value">${result.probabilities.human}%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    resultSection.style.display = 'block';
+    resultSection.scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+{% endblock %}

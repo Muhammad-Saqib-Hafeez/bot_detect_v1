@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bot Detection - Behavior Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .slide-in {
+            animation: slide-in 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+        }
+        @keyframes slide-in {
+            from { opacity: 0; transform: translateY(50px);}
+            to { opacity: 1; transform: none;}
+        }
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-100 via-green-50 to-blue-300 min-h-screen flex items-center justify-center p-4">
+<div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-2xl text-center border-2 border-blue-300 slide-in">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+        </div>
+        <h2 class="text-3xl font-extrabold mb-2 text-blue-700">Advanced Bot Detection</h2>
+        <p class="text-lg text-gray-600">Two-layer security analysis in progress...</p>
+    </div>
+
+    <!-- Progress Steps -->
+    <div class="flex justify-between items-center mb-8 relative">
+        <div class="flex-1 h-1 bg-gray-200 absolute top-4 left-0 right-0 -z-10">
+            <div id="progressBar" class="h-1 bg-green-500 progress-bar" style="width: 0%"></div>
+        </div>
+        <div class="flex flex-col items-center">
+            <div id="step1" class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold">1</div>
+            <span class="text-xs mt-1 text-gray-600">Primary Scan</span>
+        </div>
+        <div class="flex flex-col items-center">
+            <div id="step2" class="w-8 h-8 rounded-full bg-gray-300 text-white flex items-center justify-center font-bold">2</div>
+            <span class="text-xs mt-1 text-gray-600">Behavior Analysis</span>
+        </div>
+        <div class="flex flex-col items-center">
+            <div id="step3" class="w-8 h-8 rounded-full bg-gray-300 text-white flex items-center justify-center font-bold">3</div>
+            <span class="text-xs mt-1 text-gray-600">Final Decision</span>
+        </div>
+    </div>
+
+    <!-- Status Messages -->
+    <div id="status" class="my-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+        <div class="flex items-center justify-center space-x-2">
+            <div class="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+            <span class="text-blue-700 font-semibold" id="statusText">Initializing security analysis...</span>
+        </div>
+    </div>
+
+    <!-- Timer Display -->
+    <div id="timerSection" class="my-4 p-3 bg-orange-50 rounded-lg border border-orange-200 hidden">
+        <div class="flex items-center justify-center space-x-2">
+            <div class="w-4 h-4 bg-orange-500 rounded-full animate-pulse"></div>
+            <span class="text-orange-700 font-semibold">Auto-analysis in: <span id="countdown">3</span>s</span>
+        </div>
+    </div>
+
+    <!-- Metrics Display -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-left mb-6">
+        <div class="bg-blue-50 p-4 rounded-lg shadow">
+            <span class="text-sm font-medium text-gray-500">Mouse Moves</span>
+            <div class="text-2xl font-bold text-blue-600" id="metric_num_points">0</div>
+        </div>
+        <div class="bg-green-50 p-4 rounded-lg shadow">
+            <span class="text-sm font-medium text-gray-500">Total Distance</span>
+            <div class="text-2xl font-bold text-green-600" id="metric_total_distance">0</div>
+        </div>
+        <div class="bg-yellow-50 p-4 rounded-lg shadow">
+            <span class="text-sm font-medium text-gray-500">Angle Variance</span>
+            <div class="text-2xl font-bold text-yellow-600" id="metric_angle_variance">0</div>
+        </div>
+        <div class="bg-purple-50 p-4 rounded-lg shadow">
+            <span class="text-sm font-medium text-gray-500">Mean Step</span>
+            <div class="text-2xl font-bold text-purple-600" id="metric_mean_step">0</div>
+        </div>
+    </div>
+
+    <!-- Analysis Details -->
+    <div id="analysisDetails" class="hidden bg-gray-50 rounded-lg p-4 mb-6 text-left">
+        <h4 class="font-semibold text-gray-800 mb-2">Analysis Results:</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div id="primaryResult" class="p-2 bg-white rounded border"></div>
+            <div id="mouseResult" class="p-2 bg-white rounded border"></div>
+        </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+        <p class="text-yellow-800 text-sm">
+            <strong>Please interact with this page:</strong> Move your mouse around naturally for the most accurate behavior analysis. 
+            <span class="font-semibold">Analysis will proceed automatically in 3 seconds.</span>
+        </p>
+    </div>
+</div>
+
+<script>
+const sessionId = "{{ session_id }}";
+let moves = [];
+let t0 = Date.now();
+let analysisStarted = false;
+let autoAnalysisTimer = null;
+let countdownTimer = null;
+let countdownValue = 3;
+let dataCollectionTimer = null;
+
+// Update progress bar and steps
+function updateProgress(step) {
+    const progress = (step / 3) * 100;
+    document.getElementById('progressBar').style.width = `${progress}%`;
+    
+    // Update step colors
+    for (let i = 1; i <= 3; i++) {
+        const stepEl = document.getElementById(`step${i}`);
+        if (i <= step) {
+            stepEl.className = 'w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-bold';
+        } else if (i === step + 1) {
+            stepEl.className = 'w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold';
+        } else {
+            stepEl.className = 'w-8 h-8 rounded-full bg-gray-300 text-white flex items-center justify-center font-bold';
+        }
+    }
+}
+
+// Update status message
+function updateStatus(message) {
+    document.getElementById('statusText').textContent = message;
+}
+
+// Update countdown timer
+function updateCountdown(value) {
+    document.getElementById('countdown').textContent = value;
+}
+
+// Show/hide timer section
+function showTimerSection(show) {
+    const timerSection = document.getElementById('timerSection');
+    if (show) {
+        timerSection.classList.remove('hidden');
+    } else {
+        timerSection.classList.add('hidden');
+    }
+}
+
+// Start auto-analysis countdown
+function startAutoAnalysisCountdown() {
+    showTimerSection(true);
+    countdownValue = 3;
+    updateCountdown(countdownValue);
+    
+    countdownTimer = setInterval(() => {
+        countdownValue--;
+        updateCountdown(countdownValue);
+        
+        if (countdownValue <= 0) {
+            clearInterval(countdownTimer);
+            showTimerSection(false);
+            if (!analysisStarted) {
+                startAnalysis();
+            }
+        }
+    }, 1000);
+}
+
+// Cancel auto-analysis
+function cancelAutoAnalysis() {
+    if (autoAnalysisTimer) {
+        clearTimeout(autoAnalysisTimer);
+        autoAnalysisTimer = null;
+    }
+    if (countdownTimer) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
+    }
+    showTimerSection(false);
+}
+
+// Update metrics display
+function updateMetrics(metrics) {
+    document.getElementById('metric_num_points').textContent = metrics.num_points;
+    document.getElementById('metric_total_distance').textContent = metrics.total_distance.toFixed(1);
+    document.getElementById('metric_angle_variance').textContent = metrics.angle_variance.toFixed(3);
+    document.getElementById('metric_mean_step').textContent = metrics.mean_step_dist.toFixed(2);
+}
+
+// Show analysis results
+function showAnalysisResults(primary, mouse) {
+    document.getElementById('analysisDetails').classList.remove('hidden');
+    document.getElementById('primaryResult').innerHTML = `
+        <strong>Primary Detection:</strong><br>
+        Type: <span class="font-bold ${primary.type === 'human' ? 'text-green-600' : 'text-red-600'}">${primary.type}</span><br>
+        Confidence: ${primary.confidence}%
+    `;
+    document.getElementById('mouseResult').innerHTML = `
+        <strong>Behavior Analysis:</strong><br>
+        Type: <span class="font-bold ${mouse.type === 'human' ? 'text-green-600' : 'text-red-600'}">${mouse.type}</span><br>
+        Confidence: ${mouse.confidence}%
+    `;
+}
+
+function processMouseData() {
+    updateStatus("Processing behavior data...");
+    
+    const num_points = moves.length;
+    let total_distance = 0;
+    let prev = null;
+    let max_step_dist = 0;
+    let min_step_dist = Number.POSITIVE_INFINITY;
+    let sum_steps = 0;
+    let angle_variance = 0, prev_angle = null, angles = [];
+    let mean_step_dist = 0;
+
+    // If no mouse data was collected, use default values that indicate bot-like behavior
+    if (moves.length < 2) {
+        // Default values that typically indicate bot behavior (no movement)
+        min_step_dist = 0;
+        angle_variance = 0;
+        mean_step_dist = 0;
+    } else {
+        // Calculate metrics from actual mouse data
+        moves.forEach((p, i) => {
+            if (prev) {
+                const dx = p.x - prev.x, dy = p.y - prev.y;
+                const step = Math.sqrt(dx*dx + dy*dy);
+                total_distance += step;
+                max_step_dist = Math.max(max_step_dist, step);
+                min_step_dist = Math.min(min_step_dist, step);
+                sum_steps += step;
+                let angle = Math.atan2(dy, dx);
+                if (prev_angle !== null) {
+                    angles.push(angle - prev_angle);
+                }
+                prev_angle = angle;
+            }
+            prev = p;
+        });
+
+        mean_step_dist = num_points > 1 ? sum_steps / (num_points - 1) : 0;
+        angle_variance = angles.length ? angles.map(a => (a - (angles.reduce((a,b) => a+b,0)/angles.length))**2).reduce((a,b) => a+b,0)/angles.length : 0;
+        if (min_step_dist === Number.POSITIVE_INFINITY) min_step_dist = 0;
+    }
+
+    const features = {
+        num_points, 
+        total_distance,
+        max_step_dist, 
+        min_step_dist, 
+        mean_step_dist, 
+        angle_variance
+    };
+
+    updateMetrics(features);
+    
+    // Send data for analysis
+    updateStatus("Making final security decision...");
+    updateProgress(3);
+    
+    fetch("/analyze-behavior", {
+        method: "POST",
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+            session_id: sessionId,
+            features: {
+                min_step_dist: min_step_dist,
+                angle_variance: angle_variance,
+                mean_step_dist: mean_step_dist
+            }
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.error) {
+            updateStatus("Analysis error: " + data.error);
+            return;
+        }
+        
+        showAnalysisResults(data.primary_detection, data.mouse_analysis);
+        updateStatus(`Final decision: ${data.final_type} (${data.final_confidence}% confidence)`);
+        
+        // Redirect after showing results
+        setTimeout(() => {
+            window.location.href = data.redirect_url;
+        }, 2000);
+    })
+    .catch(error => {
+        updateStatus("Analysis failed: " + error.message);
+        console.error('Analysis error:', error);
+    });
+}
+
+// Mouse tracking
+document.addEventListener('mousemove', e => {
+    const now = Date.now();
+    moves.push({x: e.clientX, y: e.clientY, t: now - t0});
+    
+    // If this is the first interaction and auto-analysis is scheduled, cancel it
+    if (moves.length === 1 && autoAnalysisTimer) {
+        cancelAutoAnalysis();
+    }
+    
+    // If we have enough data and analysis hasn't started, start it immediately
+    if (!analysisStarted && moves.length >= 5) {
+        startAnalysis();
+    }
+});
+
+// Also track scroll events
+document.addEventListener('scroll', () => {
+    // If this is the first interaction and auto-analysis is scheduled, cancel it
+    if (moves.length === 0 && autoAnalysisTimer) {
+        cancelAutoAnalysis();
+    }
+});
+
+function startAnalysis() {
+    if (analysisStarted) return;
+    analysisStarted = true;
+    
+    updateProgress(1);
+    updateStatus("Primary security scan completed");
+    
+    // Clear any existing timers
+    if (dataCollectionTimer) {
+        clearTimeout(dataCollectionTimer);
+    }
+    
+    // Move to step 2 immediately
+    updateProgress(2);
+    updateStatus("Analyzing mouse behavior patterns...");
+    
+    // Process mouse data immediately (no delay)
+    processMouseData();
+}
+
+// Start primary analysis immediately
+updateProgress(1);
+updateStatus("Primary security scan in progress...");
+
+// Schedule auto-analysis to start after 3 seconds if no user interaction
+autoAnalysisTimer = setTimeout(() => {
+    if (!analysisStarted) {
+        startAutoAnalysisCountdown();
+    }
+}, 1000);
+
+// Fallback: Start analysis automatically after 8 seconds even with no interaction
+setTimeout(() => {
+    if (!analysisStarted) {
+        startAnalysis();
+    }
+}, 8000);
+</script>
+</body>
+</html>
